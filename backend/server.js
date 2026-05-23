@@ -34,6 +34,8 @@ const seedAdmin = async () => {
 }
 seedAdmin()
 
+app.use("/uploads", express.static("uploads"));
+
 app.use("/api/auth", require("./routes/authRoutes"))
 app.use("/api/tasks", require("./routes/taskRoutes"))
 app.use("/api/users", require("./routes/userRoutes"))

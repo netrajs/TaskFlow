@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import axiosInstance from "../../utils/axiosInstance";
 import {
   Zap,
   LayoutDashboard,
@@ -20,9 +21,32 @@ const getInitials = (name) => {
 };
 
 const Sidebar = () => {
-  const { user, logout } = useAuth();
+  const { user, setUser, logout } = useAuth();
+  const [uploading, setUploading] = useState(false);
 
   const isAdmin = user?.role === "admin";
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("photo", file);
+
+    try {
+      const response = await axiosInstance.patch("/api/auth/profile/photo", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+      setUser(response.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const links = isAdmin
     ? [
@@ -44,17 +68,33 @@ const Sidebar = () => {
       </div>
 
       <div className="p-4 border-b border-white/10 flex items-center gap-3">
-        {user?.profileImageUrl ? (
-          <img
-            src={user.profileImageUrl}
-            alt={user.name}
-            className="rounded-full w-10 h-10 object-cover border border-white/10"
+        <label className="relative cursor-pointer group">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="hidden"
+            disabled={uploading}
           />
-        ) : (
-          <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm">
-            {getInitials(user?.name)}
-          </div>
-        )}
+          {user?.profileImageUrl ? (
+            <img
+              src={user.profileImageUrl}
+              alt={user.name}
+              className={`rounded-full w-10 h-10 object-cover border transition-all ${
+                uploading ? "border-blue-500 border-2 opacity-50" : "border-white/10 group-hover:border-blue-400"
+              }`}
+            />
+          ) : (
+            <div className={`w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-sm border transition-all ${
+              uploading ? "border-blue-500 border-2 animate-pulse" : "border-transparent group-hover:border-blue-400"
+            }`}>
+              {getInitials(user?.name)}
+            </div>
+          )}
+          {uploading && (
+            <div className="absolute inset-0 rounded-full border-2 border-blue-500 border-t-transparent animate-spin" />
+          )}
+        </label>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="text-white text-sm font-medium truncate">

@@ -169,6 +169,22 @@ const getUserDashboardData = async (req, res) => {
   }
 };
 
+const updateTaskAssignees = async (req, res) => {
+  try {
+    const task = await Task.findByIdAndUpdate(
+      req.params.id,
+      { assignedTo: req.body.assignedTo },
+      { new: true }
+    ).populate("assignedTo", "name email profileImageUrl");
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+    res.json(task);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getAllTasks,
   getTaskById,
@@ -177,6 +193,7 @@ module.exports = {
   deleteTask,
   updateTaskStatus,
   updateTodoChecklist,
+  updateTaskAssignees,
   getDashboardData,
   getUserDashboardData
 };

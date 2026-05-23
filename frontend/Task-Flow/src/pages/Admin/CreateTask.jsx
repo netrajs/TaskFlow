@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../../utils/axiosInstance";
 import ApiPaths from "../../utils/ApiPaths";
 import { Trash2, Plus } from "lucide-react";
+import toast from "react-hot-toast";
 
 const CreateTask = () => {
   const [data, setData] = useState({
@@ -23,6 +24,7 @@ const CreateTask = () => {
   });
 
   const navigate = useNavigate();
+  const { id } = useParams();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -35,6 +37,32 @@ const CreateTask = () => {
     };
     fetchUsers();
   }, []);
+
+  useEffect(() => {
+    if (id) {
+      const fetchTask = async () => {
+        try {
+          const response = await axiosInstance.get(ApiPaths.TASKS.GET_BY_ID(id));
+          const task = response.data;
+          setData((prev) => ({
+            ...prev,
+            formData: {
+              title: task.title || "",
+              description: task.description || "",
+              priority: task.priority || "low",
+              dueDate: task.dueDate ? task.dueDate.split("T")[0] : "",
+              assignedTo: task.assignedTo ? task.assignedTo.map((u) => u._id || u) : [],
+              todoChecklist: task.todoChecklist || [],
+              attachments: task.attachments || []
+            }
+          }));
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      fetchTask();
+    }
+  }, [id]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -58,6 +86,18 @@ const CreateTask = () => {
         }
       };
     });
+  };
+
+  const handleUpdateAssignees = async () => {
+    try {
+      await axiosInstance.patch(`/api/tasks/${id}/assignees`, {
+        assignedTo: data.formData.assignedTo
+      });
+      toast.success("Assignees updated");
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to update assignees");
+    }
   };
 
   const handleAddTodo = (e) => {
@@ -111,7 +151,11 @@ const CreateTask = () => {
     if (!data.formData.title) return;
     setData((prev) => ({ ...prev, loading: true, error: null }));
     try {
-      await axiosInstance.post(ApiPaths.TASKS.CREATE, data.formData);
+      if (id) {
+        await axiosInstance.put(ApiPaths.TASKS.UPDATE(id), data.formData);
+      } else {
+        await axiosInstance.post(ApiPaths.TASKS.CREATE, data.formData);
+      }
       navigate("/admin/tasks");
     } catch (err) {
       setData((prev) => ({ ...prev, loading: false, error: err.message }));
@@ -121,7 +165,7 @@ const CreateTask = () => {
   return (
     <div className="max-w-3xl mx-auto p-6 space-y-6">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Create Task</h1>
+        <h1 className="text-2xl font-bold text-gray-800">{id ? "Update Task" : "Create Task"}</h1>
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm p-8 space-y-6 border border-gray-200">
@@ -199,6 +243,15 @@ const CreateTask = () => {
                 </button>
               );
             })}
+            {id && (
+              <button
+                type="button"
+                onClick={handleUpdateAssignees}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors shadow-sm ml-2 border border-blue-700"
+              >
+                Update Assignees
+              </button>
+            )}
           </div>
         </div>
 
@@ -279,7 +332,7 @@ const CreateTask = () => {
           disabled={data.loading}
           className="w-full bg-[#0052CC] hover:bg-[#0065FF] text-white font-semibold py-2.5 rounded-lg transition-colors flex items-center justify-center text-sm disabled:opacity-75 shadow-sm"
         >
-          {data.loading ? "Creating..." : "Create Task"}
+          {data.loading ? (id ? "Updating..." : "Creating...") : (id ? "Update Task" : "Create Task")}
         </button>
       </form>
     </div>

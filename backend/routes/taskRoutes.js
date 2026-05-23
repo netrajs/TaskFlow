@@ -8,6 +8,7 @@ const {
   deleteTask,
   updateTaskStatus,
   updateTodoChecklist,
+  updateTaskAssignees,
   getDashboardData,
   getUserDashboardData
 } = require("../controllers/taskController");
@@ -25,5 +26,6 @@ router.delete("/:id", protect, adminOnly, deleteTask);
 
 router.patch("/:id/status", protect, updateTaskStatus);
 router.patch("/:id/todo", protect, updateTodoChecklist);
+router.patch("/:id/assignees", protect, adminOnly, updateTaskAssignees);
 
 module.exports = router;
