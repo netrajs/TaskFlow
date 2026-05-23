@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-primary: #0052CC;
+  --color-brand-accent: #0065FF;
+  --color-sidebar-bg: #0A1929;
+  --color-sidebar-text: #B8C7E0;
+  --color-sidebar-active: #1C3A5E;
+  --color-surface-card: #ffffff;
+  --color-border-jira: #e2e8f0;
+  --font-sans: 'Inter', sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #f4f5f7;
+  color: #172b4d;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }
+
+/* Kanban Board specific hide scrollbar but keep functionality */
+.kanban-column::-webkit-scrollbar {
+  width: 4px;
+}
+.kanban-column::-webkit-scrollbar-thumb {
+  background: #dfe1e6;
+}
