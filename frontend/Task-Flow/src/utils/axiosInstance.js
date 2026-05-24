@@ -2,7 +2,7 @@ import axios from "axios";
 import { BASE_URL } from "./ApiPaths";
 
 const axiosInstance = axios.create({
-  baseURL: BASE_URL
+  baseURL: "https://taskflow-qbqy.onrender.com"
 });
 
 axiosInstance.interceptors.request.use(
