@@ -1,60 +1,34 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import { Toaster } from "react-hot-toast";
-import Layout from "./components/layout/Layout";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import PrivateRoutes from "./routes/PrivateRoutes";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import AdminDashboard from "./pages/Admin/Dashboard";
-import ManageTask from "./pages/Admin/ManageTask";
 import CreateTask from "./pages/Admin/CreateTask";
-import ManageUser from "./pages/Admin/ManageUser";
 import UserDashboard from "./pages/Users/Dashboard";
 import MyTasks from "./pages/Users/MyTasks";
-import PrivateRoutes from "./routes/PrivateRoutes";
-import { AuthProvider } from "./context/AuthContext";
-import { TaskProvider } from "./context/TaskContext";
 
-function App() {
+const App = () => {
   return (
-    <AuthProvider>
-      <TaskProvider>
-        <div className="min-h-screen bg-[#f8fafc]">
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              className: "font-sans text-sm font-medium",
-              duration: 3000
-            }}
-          />
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/" element={<Navigate to="/login" replace />} />
+    <Router>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
-            <Route element={<PrivateRoutes requiredRole="admin" />}>
-              <Route path="/admin" element={<Layout />}>
-                <Route path="dashboard" element={<AdminDashboard />} />
-                <Route path="tasks" element={<ManageTask />} />
-                <Route path="create-task" element={<CreateTask />} />
-                <Route path="task/:id" element={<CreateTask />} />
-                <Route path="users" element={<ManageUser />} />
-              </Route>
-            </Route>
+        <Route element={<PrivateRoutes requiredRole="admin" />}>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/tasks" element={<CreateTask />} />
+        </Route>
 
-            <Route element={<PrivateRoutes requiredRole="user" />}>
-              <Route path="/user" element={<Layout />}>
-                <Route path="dashboard" element={<UserDashboard />} />
-                <Route path="tasks" element={<MyTasks />} />
-                <Route path="task/:id" element={<MyTasks />} />
-              </Route>
-            </Route>
+        <Route element={<PrivateRoutes requiredRole="user" />}>
+          <Route path="/user/dashboard" element={<UserDashboard />} />
+          <Route path="/user/tasks" element={<MyTasks />} />
+        </Route>
 
-            <Route path="*" element={<Navigate to="/login" replace />} />
-          </Routes>
-        </div>
-      </TaskProvider>
-    </AuthProvider>
+        <Route path="/" element={<Navigate to="/login" />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
