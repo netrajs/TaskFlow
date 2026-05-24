@@ -222,8 +222,6 @@ Frontend runs at: `http://localhost:5174`
 
 ## 🚧 Known Issues & Future Improvements
 
- - [ ] Build Kanban board UI
- - [ ] Add drag-and-drop between Kanban columns
 - [ ] Email notifications on task assignment
 - [ ] File upload support for attachments
 - [ ] Dark mode
