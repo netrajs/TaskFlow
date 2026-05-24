@@ -17,7 +17,8 @@ export const AuthProvider = ({ children }) => {
       if (storedToken) {
         try {
           const response = await axiosInstance.get(ApiPaths.AUTH.GET_PROFILE);
-          setUser(response.data);
+          const userData = response.data.user || response.data;
+          setUser(userData);
           setToken(storedToken);
         } catch (error) {
           localStorage.removeItem("token");
@@ -30,10 +31,11 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     const res = await axiosInstance.post(ApiPaths.AUTH.LOGIN, { email, password });
+    const userData = res.data.user || res.data;
     localStorage.setItem("token", res.data.token);
-    setUser(res.data.user);
+    setUser(userData);
     setToken(res.data.token);
-    return res.data.user;
+    return userData;
   };
 
   const logout = () => {
@@ -45,10 +47,11 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (name, email, password) => {
     const res = await axiosInstance.post(ApiPaths.AUTH.REGISTER, { name, email, password });
+    const userData = res.data.user || res.data;
     localStorage.setItem("token", res.data.token);
-    setUser(res.data.user);
+    setUser(userData);
     setToken(res.data.token);
-    return res.data.user;
+    return userData;
   };
 
   return (
