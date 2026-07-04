@@ -1,6 +1,7 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import PrivateRoutes from "./routes/PrivateRoutes";
+import Layout from "./components/layout/Layout";
 import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import AdminDashboard from "./pages/Admin/Dashboard";
@@ -15,13 +16,17 @@ const App = () => {
       <Route path="/register" element={<Register />} />
 
       <Route element={<PrivateRoutes requiredRole="admin" />}>
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/tasks" element={<CreateTask />} />
+        <Route element={<Layout />}>
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/admin/tasks" element={<CreateTask />} />
+        </Route>
       </Route>
 
       <Route element={<PrivateRoutes requiredRole="user" />}>
-        <Route path="/user/dashboard" element={<UserDashboard />} />
-        <Route path="/user/tasks" element={<MyTasks />} />
+        <Route element={<Layout />}>
+          <Route path="/user/dashboard" element={<UserDashboard />} />
+          <Route path="/user/tasks" element={<MyTasks />} />
+        </Route>
       </Route>
 
       <Route path="/" element={<Navigate to="/login" />} />
